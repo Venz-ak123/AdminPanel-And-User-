@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; }
+    nav { background:#333; color:#fff; padding:10px; display:flex; justify-content:space-between; }
+    nav .brand { font-weight:bold; }
+    nav .menu a { color:#fff; margin-left:15px; text-decoration:none; }
+    .tabs { display:flex; background:#f0f0f0; }
+    .tabs button { flex:1; padding:10px; border:none; cursor:pointer; background:#ddd; }
+    .tabs button.active { background:#fff; border-bottom:2px solid #333; }
+    .editor textarea { width:100%; height:200px; font-family:monospace; }
+    .actions { margin:10px; }
+    iframe { width:100%; height:300px; border:1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="brand">Admin Panel</div>
+    <div class="menu">
+      <a href="#">Home</a>
+      <a href="#">Settings</a>
+    </div>
+  </nav>
+
+  <div class="tabs">
+    <button onclick="openTab('html')" id="tab-html" class="active">HTML</button>
+    <button onclick="openTab('css')" id="tab-css">CSS</button>
+    <button onclick="openTab('js')" id="tab-js">JS</button>
+  </div>
+
+  <div class="editor">
+    <div id="editor-html"><textarea id="htmlCode" placeholder="Tulis HTML di sini"></textarea></div>
+    <div id="editor-css" style="display:none;"><textarea id="cssCode" placeholder="Tulis CSS di sini"></textarea></div>
+    <div id="editor-js" style="display:none;"><textarea id="jsCode" placeholder="Tulis JS di sini"></textarea></div>
+  </div>
+
+  <div class="actions">
+    <button onclick="preview()">Preview</button>
+    <button onclick="publish()">Publish</button>
+  </div>
+
+  <h3>Live Preview:</h3>
+  <iframe id="preview"></iframe>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    var firebaseConfig = {
+      apiKey: "api key fierbase lu",
+      authDomain: "ssuain fierbase",
+      databaseURL: "sesuain fierbase lu",
+      projectId: "sesuain",
+      storageBucket: "sesuain punya lupp",
+      messagingSenderId: "isi sesuai",
+      appId: "app id lu"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function openTab(tab) {
+      document.querySelectorAll('.editor > div').forEach(div => div.style.display='none');
+      document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('editor-'+tab).style.display='block';
+      document.getElementById('tab-'+tab).classList.add('active');
+    }
+
+    function buildPage() {
+      const html = document.getElementById('htmlCode').value;
+      const css = document.getElementById('cssCode').value;
+      const js = document.getElementById('jsCode').value;
+      return `<!DOCTYPE html><html><head><style>${css}</style></head><body>${html}<script>${js}<\/script></body></html>`;
+    }
+
+    function preview() {
+      const code = buildPage();
+      document.getElementById('preview').srcdoc = code;
+    }
+
+    function publish() {
+      const code = buildPage();
+      db.ref('Usuarios/data').set({
+        renderHtml: code,
+        updatedAt: Date.now()
+      }).then(() => {
+        alert('Published!');
+      });
+    }
+  </script>
+</body>
+</html>
